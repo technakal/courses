@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
+import { Route, Link, NavLink } from 'react-router-dom';
 
-// TODO Import Router
+// Component Imports
+import Header from './components/Header';
+import Courses from './components/Courses';
+import CourseDetails from './components/CourseDetails';
+
 // TODO Set up Routes
 // TODO Pretty much everything.
 
@@ -21,21 +26,18 @@ class App extends Component {
   }
 
   render() {
+    const { isAuthenticated, isLoading } = this.state;
     return (
       <div className="App">
-        <header className="App-header">
-          { this.state.isLoading
-              ? <h1>Loading...</h1>
-              : <h1>Course Directory</h1>
-          }
-          { this.state.courses.map(course =>
-            <div key={course._id}>
-              <h2>{course.title}</h2>
-              <p>{course.description}</p>
-              <em>{`Owner: ${course.user[0].firstName} ${course.user[0].lastName}`}</em>
-            </div>
-          )}
-        </header>
+        <Header isAuthenticated={this.state.isAuthenticated}/>
+        { isLoading
+          ? <h1>Loading</h1>
+          : <Courses courses={this.state.courses} isAuthenticated={isAuthenticated} />
+        }
+        { isLoading
+          ? null
+          : <CourseDetails isAuthenticated={isAuthenticated}/>
+        }
       </div>
     );
   }
