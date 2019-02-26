@@ -95,13 +95,10 @@ class CourseDetails extends Component {
   state = {
     id: '57029ed4795118be119cc441',
     course: {
-      _id: '...',
-      title: 'Loading',
-      description: '...',
-      user: [{
-        firstName: '...',
-        lastName: '...'
-      }],
+      _id: null,
+      title: null,
+      description: null,
+      user: [],
     }
   };
 
@@ -117,7 +114,12 @@ class CourseDetails extends Component {
   render() {
     const { isAuthenticated } = this.props;
     const { title, description, estimatedTime, materialsNeeded } = this.state.course;
-    const user = this.state.course.user[0];
+    let user;
+
+    if(this.state.course.user.length) {
+      user = this.state.course.user[0];
+    };
+
     return(
       <div>
         <div className={"actions--bar"}>
@@ -126,7 +128,7 @@ class CourseDetails extends Component {
             : null
           }
         </div>
-        <CourseInfo title={title} description={description} user={user} />
+        <CourseInfo title={title} description={description} user={user ? user: null} />
         { estimatedTime || materialsNeeded
           ? <CourseStats estimatedTime={ estimatedTime } materialsNeeded={ materialsNeeded }/>
           : null

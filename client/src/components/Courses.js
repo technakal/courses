@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-// TODO Call "GET api/courses".
-// TODO If authenticated, render list of user courses.
 
 const NewCourse = () => {
   return (
@@ -23,7 +21,7 @@ const CourseCard = (props) => {
   return (
     <div className={"grid-33"}>
       <a className="course--module course--link" href={`/${_id}`}>
-        <h4 className={"course-label"}>Course</h4>
+        <h4 className={"course--label"}>Course</h4>
         <h3 className={"course--title"}>{title}</h3>
       </a>
     </div>
@@ -36,9 +34,10 @@ const CourseCard = (props) => {
  * Stateful component.
  */
 class Courses extends Component {
-  state = {
+  state = {};
 
-  };
+  // TODO Call "GET api/courses".
+  // TODO If authenticated, render list of user courses.
 
   render() {
     const { courses, isAuthenticated } = this.props;
@@ -47,7 +46,7 @@ class Courses extends Component {
         {courses.map(course =>
           <CourseCard key={course._id} course={course} />
         )}
-        {isAuthenticated
+        { isAuthenticated
           ? <NewCourse/>
           : null
         }

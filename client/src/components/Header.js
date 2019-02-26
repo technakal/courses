@@ -6,9 +6,10 @@ import React, { Fragment } from 'react';
  */
 const SignOut = (props) => {
   return (
-    <button>Sign Out</button>
+    <a className={"signout"}>Sign Out</a>
   )
-}
+};
+
 // TODO Remove user authentication token
 // TODO Redirect to Courses route
 
@@ -16,7 +17,7 @@ const SignOut = (props) => {
  * Header Component
  */
 const Header = (props) => {
-  const { isAuthenticated } = props;
+  const { isAuthenticated, user } = props;
   return(
     <header className={"header"}>
       <div className={"bounds"}>
@@ -24,7 +25,7 @@ const Header = (props) => {
         <nav>
           {isAuthenticated
             ? <Fragment>
-               {/* TODO If authenticated, render UserProfile component */}
+                <span>Welcome back, {`${user.firstName} ${user.lastName}!`}</span>
                 <SignOut />
               </Fragment>
             : <Fragment>
