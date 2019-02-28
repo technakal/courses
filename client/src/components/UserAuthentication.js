@@ -9,9 +9,12 @@ import { ValidationErrors } from './Errors';
 // TODO After sign-in, reroute to last page visited
 class SignIn extends Component {
   state = {
-    errors: [
-      'Incorrect credentials'
-    ]
+    errors: []
+  };
+
+  handleCancel = (e) => {
+    e.preventDefault();
+    this.props.history.push('/courses');
   };
 
   render() {
@@ -22,7 +25,7 @@ class SignIn extends Component {
         <div className="grid-33 centered signin">
           <h1>Sign In</h1>
           <div>
-            { errors
+            { errors.length
               ? <ValidationErrors errors={errors}/>
               : null
             }
@@ -36,13 +39,13 @@ class SignIn extends Component {
               <div className="grid-100 pad-bottom">
                 <button className="button" type="submit">Sign In</button>
                 <button className="button button-secondary"
-                        onClick="event.preventDefault(); location.href='index.html';">Cancel
+                        onClick={this.handleCancel}>Cancel
                 </button>
               </div>
             </form>
           </div>
           <p>&nbsp;</p>
-          <p>Don't have a user account? <a href="sign-up.html">Click here</a> to sign up!</p>
+          <p>Don't have a user account? <a href="/signup">Click here</a> to sign up!</p>
         </div>
       </div>
     )
@@ -57,11 +60,13 @@ class SignIn extends Component {
 // TODO After sign-in, reroute to Courses
 class SignUp extends Component {
   state = {
-    errors: [
-      'You gotta have a name',
-      'That email address is taken'
-    ]
-  }
+    errors: []
+  };
+
+  handleCancel = (e) => {
+    e.preventDefault();
+    this.props.history.push('/courses');
+  };
 
   render() {
     const { errors } = this.state;
@@ -70,7 +75,7 @@ class SignUp extends Component {
         <div className="grid-33 centered signin">
           <h1>Sign Up</h1>
           <div>
-            { errors
+            { errors.length
               ? <ValidationErrors errors={errors}/>
               : null
             }
@@ -92,14 +97,14 @@ class SignUp extends Component {
                 </div>
               <div className="grid-100 pad-bottom">
                 <button className="button" type="submit">Sign Up</button>
-                <button className="button button-secondary" onClick="event.preventDefault(); location.href='index.html';">
+                <button className="button button-secondary" onClick={this.handleCancel}>
                   Cancel
                 </button>
               </div>
             </form>
           </div>
           <p>&nbsp;</p>
-          <p>Already have a user account? <a href="sign-in.html">Click here</a> to sign in!</p>
+          <p>Already have a user account? <a href="/signin">Click here</a> to sign in!</p>
         </div>
       </div>
     )

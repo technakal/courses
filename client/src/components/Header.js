@@ -21,7 +21,7 @@ const Header = (props) => {
   return(
     <header className={"header"}>
       <div className={"bounds"}>
-        <h1 className={"header--logo"}>Courses</h1>
+        <a href={"/"}><h1 className={"header--logo"}>Courses</h1></a>
         <nav>
           {isAuthenticated
             ? <Fragment>
@@ -29,8 +29,8 @@ const Header = (props) => {
                 <SignOut />
               </Fragment>
             : <Fragment>
-                <a className={"signup"}>Sign Up</a>
-                <a className={"signup"}>Sign In</a>
+                <a className={"signup"} href={"/signup"} >Sign Up</a>
+                <a className={"signup"} href={"/signin"} >Sign In</a>
               </Fragment>
           }
         </nav>

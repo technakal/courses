@@ -1,4 +1,9 @@
-import React, {Component} from 'react';
+import React, { Component, Fragment } from 'react';
+import { authContext } from './AuthContext';
+
+// Components
+import { Error } from './Errors';
+import Loading from './Loading';
 
 const NewCourse = () => {
   return (
@@ -34,22 +39,50 @@ const CourseCard = (props) => {
  * Stateful component.
  */
 class Courses extends Component {
-  state = {};
+  state = {
+    courses: [],
+    errors: [],
+    isLoading: true,
+    isAuthenticated: true
+  };
 
   // TODO Call "GET api/courses".
-  // TODO If authenticated, render list of user courses.
+  // TODO Optional! If authenticated, render list of user courses.
+  dbURI = 'http://localhost:5000/api/courses';
+
+  componentWillMount () {
+    fetch(this.dbURI)
+      .then(response => response.json())
+      .then(data => this.setState({courses: data, isLoading: false}))
+      .catch(error => this.setState({errors: error}));
+  }
+
+  renderComponent = (courses) => {
+    if(this.state.isLoading) {
+      return <Loading />;
+    } else if(!this.state.courses.length) {
+      return <Error errors={this.state.errors}/>
+    } else {
+      const { isAuthenticated } = this.state;
+      return (
+        <Fragment>
+          {courses.map(course =>
+            <CourseCard key={course._id} course={course} />
+          )}
+          { isAuthenticated
+            ? <NewCourse/>
+            : null
+          }
+        </Fragment>
+      );
+    }
+  };
 
   render() {
-    const { courses, isAuthenticated } = this.props;
+    const { courses } = this.state;
     return(
       <div className={"bounds"}>
-        {courses.map(course =>
-          <CourseCard key={course._id} course={course} />
-        )}
-        { isAuthenticated
-          ? <NewCourse/>
-          : null
-        }
+        {this.renderComponent(courses)}
       </div>
     )
   }

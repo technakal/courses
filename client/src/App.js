@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Link, NavLink } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Redirect, Link, NavLink } from 'react-router-dom';
 
 // Component Imports
 import Header from './components/Header';
@@ -8,6 +8,7 @@ import CourseDetails from './components/CourseDetails';
 import CreateCourse from './components/CreateCourse';
 import UpdateCourse from './components/UpdateCourse';
 import { SignIn, SignUp } from './components/UserAuthentication';
+import { Error } from './components/Errors';
 
 // TODO Set up Routes
 // TODO Pretty much everything.
@@ -28,52 +29,25 @@ class App extends Component {
       firstName: 'Noel',
       lastName: 'Keener'
     },
-    courses: []
   };
 
-  dbURI = 'http://localhost:5000/api/courses';
-
-  componentWillMount() {
-    fetch(this.dbURI)
-      .then(response => response.json())
-      .then(data => this.setState({courses: data, isLoading: false}))
-      .catch(error => console.log(error));
-  }
-
   render() {
-    const { isAuthenticated, isLoading, user } = this.state;
-    const { courses, courseDetails, createCourse, updateCourse, signIn, signUp } = this.state.debug;
+    const { user } = this.state;
     return (
-      <div>
-        <Header isAuthenticated={this.state.isAuthenticated} user={user}/>
-        <hr />
-        { courses
-          ? <Courses courses={this.state.courses} isAuthenticated={isAuthenticated} />
-          : null
-        }
-        { courseDetails
-          ? <CourseDetails isAuthenticated={isAuthenticated}/>
-          : null
-        }
-        { createCourse
-          ? <CreateCourse isAuthenticated={isAuthenticated} user={user} />
-          : null
-        }
-        { updateCourse
-          ? <UpdateCourse />
-          : null
-        }
-        {
-          signIn
-          ? <SignIn />
-          : null
-        }
-        {
-          signUp
-            ? <SignUp />
-            : null
-        }
-      </div>
+      <BrowserRouter>
+        <div>
+          <Header isAuthenticated={this.state.isAuthenticated} user={user}/>
+          <Switch>
+            <Route exact path={"/"} render={() => <Redirect to={"/courses"} />}/>
+            <Route exact path={"/courses"} component={Courses} />
+            <Route path={"/courses/create"} component={CreateCourse} />
+            <Route path={"/courses/1"} component={CourseDetails} />
+            <Route path={"/signin"} component={SignIn} />
+            <Route path={"/signup"} component={SignUp} />
+            <Route component={Error} />
+          </Switch>
+        </div>
+      </BrowserRouter>
     );
   }
 }

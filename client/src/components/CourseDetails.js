@@ -94,6 +94,7 @@ const CourseStats = props => {
 class CourseDetails extends Component {
   state = {
     id: '57029ed4795118be119cc441',
+    isAuthenticated: true,
     course: {
       _id: null,
       title: null,
@@ -112,7 +113,7 @@ class CourseDetails extends Component {
   }
 
   render() {
-    const { isAuthenticated } = this.props;
+    const { isAuthenticated } = this.state;
     const { title, description, estimatedTime, materialsNeeded } = this.state.course;
     let user;
 
