@@ -24,9 +24,6 @@ const Error = (props) => {
     <div className="bounds">
       <h1>{type}</h1>
       <p>Sorry! We just encountered an unexpected error.</p>
-      <ul>
-        { errors.map((error, index) => <li key={index}>{error}</li>)}
-      </ul>
     </div>
   )
 }

@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import Markdown from 'react-markdown';
+
+import { Error } from './Errors';
 
 /**
  * Action Bar Component
@@ -32,16 +34,17 @@ const ActionBar = () => {
  * @returns {jsx} Courseinfo
  * @constructor
  */
-const CourseInfo = props => {
-  const {title, description, user} = props;
+const CourseInfo = (props) => {
+  const { title, description, user } = props.course;
+
   return (
     <div className={"bounds course--detail"}>
       <div className="grid-66">
         <div className={"course--header"}>
           <h4 className={"course--label"}>Course</h4>
           <h3 className={"course--title"}>{title}</h3>
-          { user ?
-            <p>By { `${ user.firstName } ${ user.lastName }` }</p>
+          { user !== undefined && user.length
+            ? <p>By { `${ user[0].firstName } ${ user[0].lastName }` }</p>
             : null
           }
         </div>
@@ -93,7 +96,7 @@ const CourseStats = props => {
  */
 class CourseDetails extends Component {
   state = {
-    id: '57029ed4795118be119cc441',
+    id: this.props.match.params.id,
     isAuthenticated: true,
     course: {
       _id: null,
@@ -107,19 +110,62 @@ class CourseDetails extends Component {
 
   componentWillMount() {
     fetch(this.dbURI)
+      .then(this.handleServerErrors)
+      .then(this.handleAPIErrors)
       .then(response => response.json())
       .then(data => this.setState({course: data}))
-      .catch(error => console.log(error));
+      .catch(error => {
+        const err = { code: error.code, message: error.message };
+        this.setState({ hasError: true, errors: err, isLoading: false });
+      });
+  }
+
+  /**
+   * Throws errors related to HTTP request codes, like 400, 500, etc.
+   * @throws {Error}
+   * @memberof App
+   */
+  handleServerErrors = res => {
+    if (!res.ok) {
+      throw Error(`Something went wrong: ${res.status} - ${res.statusText}`);
+    }
+    return res.json();
+  };
+
+  /**
+   * Throws "fail" errors from the API server, such as bad API key, incorrect parameters, etc.
+   * @throws {Error}
+   * @memberof App
+   */
+  handleAPIErrors = res => {
+    if (res.stat === 'fail') {
+      const err = new Error();
+      err.message = res.message;
+      err.code = `${res.stat.toUpperCase()} (${res.code})`;
+      throw err;
+    }
+    return res;
+  };
+
+  renderComponent() {
+    const { course } = this.state;
+    const { estimatedTime, materialsNeeded } = course;
+    if(this.state.errors) {
+      return <Error errors={this.state.errors}/>
+    }
+    return (
+      <Fragment>
+        <CourseInfo course={course} />
+        { estimatedTime || materialsNeeded
+          ? <CourseStats estimatedTime={ estimatedTime } materialsNeeded={ materialsNeeded }/>
+          : null
+        }
+      </Fragment>
+    )
   }
 
   render() {
     const { isAuthenticated } = this.state;
-    const { title, description, estimatedTime, materialsNeeded } = this.state.course;
-    let user;
-
-    if(this.state.course.user.length) {
-      user = this.state.course.user[0];
-    };
 
     return(
       <div>
@@ -129,11 +175,7 @@ class CourseDetails extends Component {
             : null
           }
         </div>
-        <CourseInfo title={title} description={description} user={user ? user: null} />
-        { estimatedTime || materialsNeeded
-          ? <CourseStats estimatedTime={ estimatedTime } materialsNeeded={ materialsNeeded }/>
-          : null
-        }
+        { this.renderComponent() }
       </div>
     )
   }

@@ -41,7 +41,7 @@ class App extends Component {
             <Route exact path={"/"} render={() => <Redirect to={"/courses"} />}/>
             <Route exact path={"/courses"} component={Courses} />
             <Route path={"/courses/create"} component={CreateCourse} />
-            <Route path={"/courses/1"} component={CourseDetails} />
+            <Route path={"/courses/:id"} component={CourseDetails} />
             <Route path={"/signin"} component={SignIn} />
             <Route path={"/signup"} component={SignUp} />
             <Route component={Error} />

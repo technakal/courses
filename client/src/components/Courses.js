@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { Link } from 'react-router-dom';
 import { authContext } from './AuthContext';
 
 // Components
@@ -25,10 +26,10 @@ const CourseCard = (props) => {
   const { title, _id } = props.course;
   return (
     <div className={"grid-33"}>
-      <a className="course--module course--link" href={`/${_id}`}>
+      <Link className="course--module course--link" to={`/courses/${_id}`}>
         <h4 className={"course--label"}>Course</h4>
         <h3 className={"course--title"}>{title}</h3>
-      </a>
+      </Link>
     </div>
   )
 };
@@ -46,7 +47,6 @@ class Courses extends Component {
     isAuthenticated: true
   };
 
-  // TODO Call "GET api/courses".
   // TODO Optional! If authenticated, render list of user courses.
   dbURI = 'http://localhost:5000/api/courses';
 
