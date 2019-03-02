@@ -16,6 +16,7 @@ const authenticateUser = (req, res, next) => {
   let message = '';
 
   const credentials = auth(req);
+  console.log(credentials);
 
   if(credentials) {
     User.findOne({ emailAddress: credentials.name }, (err, doc) => {
@@ -26,14 +27,14 @@ const authenticateUser = (req, res, next) => {
           req.currentUser = doc;
           next();
         } else {
-          res.status(401).json({error: 'Access Denied'});
+          res.status(401).json({error: 'Incorrect password.'});
         }
       } else {
-        res.status(401).json({error: 'Access Denied'});
+        res.status(401).json({error: `That account doesn't exist.`});
       }
     });
   } else {
-    res.status(401).json({error: 'Access Denied'});
+    res.status(401).json({error: `You're missing your login credentials.`});
   }
 };
 

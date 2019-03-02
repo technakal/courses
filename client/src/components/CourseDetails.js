@@ -125,8 +125,7 @@ class CourseDetails extends Component {
         } else {
           this.props.history.push('/error');
         }
-      }
-    );
+      });
   }
 
   renderComponent() {

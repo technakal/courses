@@ -15,20 +15,7 @@ import { Error } from './components/Errors';
 
 class App extends Component {
   state = {
-    debug: {
-      courses: false,
-      courseDetails: false,
-      createCourse: false,
-      updateCourse: false,
-      signIn: false,
-      signUp: true
-    },
     isLoading: true,
-    isAuthenticated: true,
-    user: {
-      firstName: 'Noel',
-      lastName: 'Keener'
-    },
   };
 
   render() {
@@ -42,6 +29,11 @@ class App extends Component {
       message: `This is embarrassing, but something went wrong. Not really sure what...`,
       status: 500,
       statusText: 'Uh-oh'
+    };
+    const forbidden = {
+      message: `You're not allowed to do that.`,
+      status: 401,
+      statusText: 'Forbidden'
     };
 
     return (
@@ -58,6 +50,9 @@ class App extends Component {
             <Route path={"/signup"} component={SignUp} />
             <Route path={'/notfound'} render={() =>
               <Error error={notFound}/>
+            } />
+            <Route path={'/forbidden'} render={() =>
+              <Error error={forbidden}/>
             } />
             <Route path={'/error'} render={() =>
               <Error error={unhandledError}/>
