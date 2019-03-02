@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 // TODO Import User components
 
 /**
@@ -6,7 +7,7 @@ import React, { Fragment } from 'react';
  */
 const SignOut = (props) => {
   return (
-    <a className={"signout"}>Sign Out</a>
+    <Link className={"signout"} to={'/signout'}>Sign Out</Link>
   )
 };
 
@@ -21,7 +22,7 @@ const Header = (props) => {
   return(
     <header className={"header"}>
       <div className={"bounds"}>
-        <a href={"/"}><h1 className={"header--logo"}>Courses</h1></a>
+        <Link to={'/'}><h1 className={"header--logo"}>Courses</h1></Link>
         <nav>
           {isAuthenticated
             ? <Fragment>
@@ -29,8 +30,8 @@ const Header = (props) => {
                 <SignOut />
               </Fragment>
             : <Fragment>
-                <a className={"signup"} href={"/signup"} >Sign Up</a>
-                <a className={"signup"} href={"/signin"} >Sign In</a>
+                <Link className={"signup"} to={"/signup"} >Sign Up</Link>
+                <Link className={"signup"} to={"/signin"} >Sign In</Link>
               </Fragment>
           }
         </nav>

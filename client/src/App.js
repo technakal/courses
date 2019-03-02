@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Switch, Route, Redirect, Link, NavLink } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 
 // Component Imports
 import Header from './components/Header';
@@ -33,6 +33,17 @@ class App extends Component {
 
   render() {
     const { user } = this.state;
+    const notFound = {
+      message: `You haven't found what you're looking for, but you have found our secret lair. You really shouldn't be here.`,
+      status: 404,
+      statusText: 'Not Found'
+    };
+    const unhandledError = {
+      message: `This is embarrassing, but something went wrong. Not really sure what...`,
+      status: 500,
+      statusText: 'Uh-oh'
+    };
+
     return (
       <BrowserRouter>
         <div>
@@ -41,10 +52,19 @@ class App extends Component {
             <Route exact path={"/"} render={() => <Redirect to={"/courses"} />}/>
             <Route exact path={"/courses"} component={Courses} />
             <Route path={"/courses/create"} component={CreateCourse} />
-            <Route path={"/courses/:id"} component={CourseDetails} />
+            <Route exact path={"/courses/:id"} component={CourseDetails} />
+            <Route path={'/courses/:id/update'} component={UpdateCourse} />
             <Route path={"/signin"} component={SignIn} />
             <Route path={"/signup"} component={SignUp} />
-            <Route component={Error} />
+            <Route path={'/notfound'} render={() =>
+              <Error error={notFound}/>
+            } />
+            <Route path={'/error'} render={() =>
+              <Error error={unhandledError}/>
+            } />
+            <Route render={() =>
+              <Error error={notFound}/>
+            } />
           </Switch>
         </div>
       </BrowserRouter>

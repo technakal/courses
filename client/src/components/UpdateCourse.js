@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { Component, Fragment } from 'react';
 import { ValidationErrors } from './Errors';
 
@@ -54,24 +55,31 @@ const UpdateForm = (props) => {
 class UpdateCourse extends Component {
   state = {
     isLoading: true,
-    id: '57029ed4795118be119cc440',
+    id: this.props.match.params.id,
     course: {
       user: []
     },
-    errors: [
-      'You suck',
-      'Do better at everything'
-    ]
+    errors: []
   };
 
   dbURI = `http://localhost:5000/api/courses/${this.state.id}`;
 
-  componentWillMount () {
-    fetch(this.dbURI)
-      .then(response => response.json())
-      .then(data => this.setState({ course: data, isLoading: false }))
-      .catch(error => console.log(error));
-  };
+  componentDidMount() {
+    axios.get(this.dbURI)
+      .then(res => {
+        if (res.status === 200) {
+          this.setState( { course: res.data, isLoading: false })
+        }
+      })
+      .catch(error => {
+          if(error.response.status === 404) {
+            this.props.history.push('/notfound');
+          } else {
+            this.props.history.push('/error');
+          }
+        }
+      );
+  }
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -80,7 +88,7 @@ class UpdateCourse extends Component {
 
   handleCancel = (e) => {
     e.preventDefault();
-    console.log(e);
+    this.props.history.push(`/courses/${this.props.match.params.id}`)
   };
 
   render() {
@@ -96,8 +104,8 @@ class UpdateCourse extends Component {
             { errors.length
               ? <ValidationErrors errors={ errors }/>
               : null
-            } <UpdateForm course={course} handleSubmit={this.handleSubmit} handleCancel={this.handleCancel}/>
             }
+            <UpdateForm course={course} handleSubmit={this.handleSubmit} handleCancel={this.handleCancel}/>
           </Fragment>
         }
       </div>

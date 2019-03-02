@@ -19,12 +19,13 @@ const ValidationErrors = (props) => {
 };
 
 const Error = (props) => {
-  const { type, errors }= props;
+  const { message, status, statusText } = props.error;
   return (
     <div className="bounds">
-      <h1>{type}</h1>
-      <p>Sorry! We just encountered an unexpected error.</p>
+      <h1>{statusText} ({status})</h1>
+      <p>{message}</p>
     </div>
   )
-}
+};
+
 export { ValidationErrors, Error };
