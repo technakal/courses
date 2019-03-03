@@ -53,6 +53,10 @@ const CreateCourseForm = (props) => {
  */
 class CreateCourse extends Component {
   state = {
+    isAuthenticated: true,
+    user: {
+      firstName: 'Noel',
+      lastName: 'Keener'},
     errors: [
       'Course requires a title',
       'Course requires a description'
@@ -76,18 +80,17 @@ class CreateCourse extends Component {
 
   render() {
     const { errors } = this.state;
-    const { user, isAuthenticated } = this.props;
     return (
       <div className={"bounds course--detail"}>
         <h1>Create Course</h1>
-        { !isAuthenticated
-          ? <h1>Please Sign In.</h1>
+        { !this.state.isAuthenticated
+          ? <h2>You must sign in to create a new course.</h2>
           : <div>
               { errors.length
                 ? <ValidationErrors errors={ errors }/>
                 : null
               }
-              <CreateCourseForm user={user} handleSubmit={ this.handleSubmit } handleCancel={this.handleCancel}/>
+              <CreateCourseForm user={this.state.user} handleSubmit={ this.handleSubmit } handleCancel={this.handleCancel}/>
             </div>
         }
       </div>

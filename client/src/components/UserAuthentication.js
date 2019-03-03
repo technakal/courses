@@ -16,7 +16,7 @@ class SignIn extends Component {
   dbURI = `http://localhost:5000/api/users`;
 
   handleChange = (e) => {
-    this.setState({ [e.target.id]: e.target.defaultValue });
+    this.setState({ [e.target.id]: e.target.value });
   };
 
   handleSubmit = (e) => {
@@ -32,7 +32,7 @@ class SignIn extends Component {
     axios.get(this.dbURI, options)
       .then(res => {
         if (res.status === 200) {
-          this.setState( {isAuthenticated: true, user: res.data.user })
+          this.setState( {isAuthenticated: true, user: res.data.user, token: res.data.token });
           this.props.history.push('/courses');
         }
       })

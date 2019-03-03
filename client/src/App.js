@@ -10,9 +10,6 @@ import UpdateCourse from './components/UpdateCourse';
 import { SignIn, SignUp } from './components/UserAuthentication';
 import { Error } from './components/Errors';
 
-// TODO Set up Routes
-// TODO Pretty much everything.
-
 class App extends Component {
   state = {
     isLoading: true,

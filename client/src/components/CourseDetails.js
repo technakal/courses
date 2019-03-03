@@ -12,9 +12,7 @@ import { Error } from './Errors';
  * @returns {jsx} ActionBar
  * @constructor
  */
-// TODO Add update handler
-// TODO Add delete handler
-const ActionBar = ({courseId}) => {
+const ActionBar = ({courseId, handleDelete}) => {
   return (
     <div className={"actions--bar"}>
       <div className={"bounds"}>
@@ -23,7 +21,7 @@ const ActionBar = ({courseId}) => {
               {/* TODO Add update course route */}
               <Link className={"button"} to={`/courses/${courseId}/update`}>Update Course</Link>
               {/*TODO Add delete course route */}
-              <Link className={"button"} to={`/courses/${courseId}/delete`}>Delete Course</Link>
+              <button className={"button"} onClick={handleDelete}>Delete Course</button>
             </span>
          </div>
       </div>
@@ -128,6 +126,34 @@ class CourseDetails extends Component {
       });
   }
 
+  deleteCourse = (e) => {
+    e.preventDefault();
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvZUBzbWl0aC5jb20iLCJpYXQiOjE1NTE2MTY4MTksImV4cCI6MTU1NDIwODgxOX0.jI__WajJycaxijiJxLEIWfrMVo4O_yZlAcZ3963gwDU'
+    const options = {
+      headers: {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${token}`
+      }
+    };
+
+    axios.delete(this.dbURI, options)
+      .then(res => {
+        if(res.status === 204) {
+          console.log(res);
+          this.props.history.push('/courses');
+        }
+      })
+      .catch(error => {
+        if(error.response.status === 404) {
+          this.props.history.push( '/notfound' );
+        } else if(error.response.status === 401) {
+          this.props.history.push('/forbidden');
+        } else {
+          this.props.history.push('/error');
+        }
+      });
+  };
+
   renderComponent() {
     const { course } = this.state;
     const { estimatedTime, materialsNeeded } = course;
@@ -151,7 +177,7 @@ class CourseDetails extends Component {
     return(
       <div>
         { isAuthenticated
-          ? <ActionBar courseId={this.state.id} />
+          ? <ActionBar courseId={this.state.id}  handleDelete={this.deleteCourse} />
           : null
         }
         { this.renderComponent() }
