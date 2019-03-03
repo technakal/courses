@@ -3,8 +3,34 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const auth = require('basic-auth');
 const { check, validationResult } = require('express-validator/check');
+const jwt = require('jsonwebtoken');
+const config = require('../config/config');
 const User = require('../models/models').User;
 const Course = require('../models/models').Course;
+
+/**
+ * Verify JSON web token.
+ */
+const verifyToken = (req, res, next) => {
+  let token = req.headers['x-access-token'] || req.headers['authorization'];
+
+  if(token) {
+    if(token.startsWith('Bearer ')) {
+      token = token.slice(7, token.length);
+    }
+
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if(err) return next(err);
+      req.currentUser = decoded.username;
+      return next();
+    });
+  } else {
+    return res.status(401).json({
+      success: false,
+      message: "No auth token. Please sign in."
+    }).next();
+  }
+};
 
 /**
  * Authenticates the user to the app.
@@ -13,10 +39,7 @@ const Course = require('../models/models').Course;
  * @param next
  */
 const authenticateUser = (req, res, next) => {
-  let message = '';
-
   const credentials = auth(req);
-  console.log(credentials);
 
   if(credentials) {
     User.findOne({ emailAddress: credentials.name }, (err, doc) => {
@@ -25,6 +48,11 @@ const authenticateUser = (req, res, next) => {
         const authenticated = bcrypt.compareSync(credentials.pass, doc.password);
         if(authenticated) {
           req.currentUser = doc;
+          req.token = jwt.sign(
+            {username: credentials.name},
+            config.secret,
+            {expiresIn: '30d'}
+          );
           next();
         } else {
           res.status(401).json({error: 'Incorrect password.'});
@@ -38,15 +66,38 @@ const authenticateUser = (req, res, next) => {
   }
 };
 
+// TODO Create token based authentication
+// TODO Add token based auth to all routes except sign-in
+
 /**
  * Checks if the current user is the owner of the current course.
  * @param [object] req - The request object, containing course and user information.
  * @returns {boolean}
  */
-const isCourseOwner = (req) => {
-  const courseOwner = req.course.user[0]._id.toString();
-  const currentOwner = req.currentUser._id.toString();
-  return courseOwner === currentOwner;
+const isCourseOwner = (req, res, next) => {
+  User.find({emailAddress: req.currentUser}, (err, doc) => {
+    if(err) return next(err);
+    if(!doc) {
+      err = new Error( 'Not Found' );
+      err.status = 401;
+      return next(err);
+    }
+    req.isOwner = doc[0]._id.toString() === req.course.user[0].toString();
+    next();
+  });
+};
+
+const getUser = (req, res, next) => {
+  User.find({emailAddress: req.currentUser}, (err, doc) => {
+    if(err) return next(err);
+    if(!doc) {
+      err = new Error( 'Not Found' );
+      err.status = 404;
+      return next(err);
+    }
+    req.user = doc[0];
+    next();
+  });
 };
 
 /**
@@ -70,8 +121,16 @@ router.param('id', (req, res, next, id) => {
  * GET /api/users 200
  */
 router.get('/users', authenticateUser, (req, res) => {
-  const user = req.currentUser
-  res.status(200).json({user});
+  const user = req.currentUser;
+  const decoded = req.decoded;
+  const token = req.token;
+  const response = {
+    success: true,
+    user,
+    token,
+    decoded
+  };
+  res.status(200).json(response);
 });
 
 /**
@@ -151,7 +210,7 @@ router.get('/courses/:id', (req, res, next) => {
  * Validates required fields.
  * POST /api/courses 201
  */
-router.post('/courses', authenticateUser, [
+router.post('/courses', verifyToken, getUser, [
   check('title')
     .exists({checkNull: true, checkFalsy: true})
     .withMessage('Course creation requires title.'),
@@ -165,7 +224,7 @@ router.post('/courses', authenticateUser, [
     return res.status(400).json({errors: errorMessages});
   }
   const course = new Course(req.body);
-  course.user = req.currentUser._id;
+  course.user = req.user._id;
   course.save((err, course) => {
     if (err) return next(err);
     res.status(201).location('/' + course._id).end();
@@ -178,7 +237,7 @@ router.post('/courses', authenticateUser, [
  * PUT /api/courses/:id 204
  * @param [string] id - The course id of the course to update.
  */
-router.put('/courses/:id', authenticateUser, [
+router.put('/courses/:id', verifyToken, isCourseOwner, [
   check('title')
     .exists({checkNull: true, checkFalsy: true})
     .withMessage('Course update requires title.'),
@@ -191,7 +250,7 @@ router.put('/courses/:id', authenticateUser, [
     const errorMessages = errors.array().map(error => error.msg);
     return res.status(400).json({errors: errorMessages});
   }
-  if(isCourseOwner(req)) {
+  if(req.isOwner) {
     Course.findOneAndUpdate({ _id: req.params.id }, req.body, (err, doc) => {
       if(err) return next(err);
       res.status(204).json(doc);
@@ -207,8 +266,8 @@ router.put('/courses/:id', authenticateUser, [
  * DELETE /api/courses/:id 204
  * @param [string] id - The course id of the course to delete.
  */
-router.delete('/courses/:id', authenticateUser, (req, res, next) => {
-  if(isCourseOwner(req)) {
+router.delete('/courses/:id', verifyToken, isCourseOwner, (req, res, next) => {
+  if(req.isOwner) {
     Course.findOneAndDelete({ _id: req.course._id }, (err) => {
       if(err) return next(err);
       res.status(204).json('Deleted');
