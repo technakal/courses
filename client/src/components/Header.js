@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import {AuthContext} from './AuthContext';
 // TODO Import User components
 
 /**
@@ -7,7 +8,7 @@ import { Link } from 'react-router-dom';
  */
 const SignOut = (props) => {
   return (
-    <Link className={"signout"} to={'/signout'}>Sign Out</Link>
+    <Link className={"signout"} onClick={props.handleSignOut} to={'/courses'}>Sign Out</Link>
   )
 };
 
@@ -18,22 +19,25 @@ const SignOut = (props) => {
  * Header Component
  */
 const Header = (props) => {
-  const { isAuthenticated, user } = props;
   return(
     <header className={"header"}>
       <div className={"bounds"}>
         <Link to={'/'}><h1 className={"header--logo"}>Courses</h1></Link>
         <nav>
-          {isAuthenticated
-            ? <Fragment>
-                <span>Welcome back, {`${user.firstName} ${user.lastName}!`}</span>
-                <SignOut />
-              </Fragment>
-            : <Fragment>
-                <Link className={"signup"} to={"/signup"} >Sign Up</Link>
-                <Link className={"signup"} to={"/signin"} >Sign In</Link>
-              </Fragment>
-          }
+              <AuthContext.Consumer>
+                {(context) => (
+                  context.state.isAuthenticated
+                    ? <Fragment>
+                        <span>Welcome back, {context.state.user}!</span>
+                        <SignOut handleSignOut={context.signOut}/>
+                      </Fragment>
+                      :<Fragment>
+                        <Link className={"signup"} to={"/signup"} >Sign Up</Link>
+                        <Link className={"signup"} to={"/signin"} >Sign In</Link>
+                      </Fragment>
+                )
+                }
+              </AuthContext.Consumer>
         </nav>
       </div>
     </header>

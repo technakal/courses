@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 
 // Component Imports
+import {AuthProvider} from './components/AuthContext';
 import Header from './components/Header';
 import Courses from './components/Courses';
 import CourseDetails from './components/CourseDetails';
@@ -34,32 +35,34 @@ class App extends Component {
     };
 
     return (
-      <BrowserRouter>
-        <div>
-          <Header isAuthenticated={this.state.isAuthenticated} user={user}/>
-          <Switch>
-            <Route exact path={"/"} render={() => <Redirect to={"/courses"} />}/>
-            <Route exact path={"/courses"} component={Courses} />
-            <Route path={"/courses/create"} component={CreateCourse} />
-            <Route exact path={"/courses/:id"} component={CourseDetails} />
-            <Route path={'/courses/:id/update'} component={UpdateCourse} />
-            <Route path={"/signin"} component={SignIn} />
-            <Route path={"/signup"} component={SignUp} />
-            <Route path={'/notfound'} render={() =>
-              <Error error={notFound}/>
-            } />
-            <Route path={'/forbidden'} render={() =>
-              <Error error={forbidden}/>
-            } />
-            <Route path={'/error'} render={() =>
-              <Error error={unhandledError}/>
-            } />
-            <Route render={() =>
-              <Error error={notFound}/>
-            } />
-          </Switch>
-        </div>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <div>
+            <Header isAuthenticated={this.state.isAuthenticated} user={user}/>
+            <Switch>
+              <Route exact path={"/"} render={() => <Redirect to={"/courses"} />}/>
+              <Route exact path={"/courses"} component={Courses} />
+              <Route path={"/courses/create"} component={CreateCourse} />
+              <Route exact path={"/courses/:id"} component={CourseDetails} />
+              <Route path={'/courses/:id/update'} component={UpdateCourse} />
+              <Route path={"/signin"} component={SignIn} />
+              <Route path={"/signup"} component={SignUp} />
+              <Route path={'/notfound'} render={() =>
+                <Error error={notFound}/>
+              } />
+              <Route path={'/forbidden'} render={() =>
+                <Error error={forbidden}/>
+              } />
+              <Route path={'/error'} render={() =>
+                <Error error={unhandledError}/>
+              } />
+              <Route render={() =>
+                <Error error={notFound}/>
+              } />
+            </Switch>
+          </div>
+        </BrowserRouter>
+      </AuthProvider>
     );
   }
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import { ValidationErrors } from './Errors';
+import {AuthContext} from './AuthContext';
 
 /**
  * Sign In Component
@@ -62,31 +63,35 @@ class SignIn extends Component {
 
     return (
       <div className="bounds">
-        <div className="grid-33 centered signin">
-          <h1>Sign In</h1>
-          <div>
-            { errors.length
-              ? <ValidationErrors errors={errors}/>
-              : null
-            }
-            <form onSubmit={this.handleSubmit}>
+        <AuthContext.Consumer>
+          {(context) => (
+            <div className="grid-33 centered signin">
+              <h1>Sign In</h1>
               <div>
-                <input id="emailAddress" name="emailAddress" type="text" className="" placeholder="Email Address" defaultValue="" onChange={this.handleChange}/>
+                { errors.length
+                  ? <ValidationErrors errors={errors}/>
+                  : null
+                }
+                <form onSubmit={this.handleSubmit}>
+                  <div>
+                    <input id="emailAddress" name="emailAddress" type="text" className="" placeholder="Email Address" defaultValue="" onChange={this.handleChange}/>
+                  </div>
+                  <div>
+                    <input id="password" name="password" type="password" className="" placeholder="Password" defaultValue="" onChange={this.handleChange}/>
+                  </div>
+                  <div className="grid-100 pad-bottom">
+                    <button className="button" type="submit">Sign In</button>
+                    <button className="button button-secondary"
+                            onClick={this.handleCancel}>Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
-              <div>
-                <input id="password" name="password" type="password" className="" placeholder="Password" defaultValue="" onChange={this.handleChange}/>
-              </div>
-              <div className="grid-100 pad-bottom">
-                <button className="button" type="submit">Sign In</button>
-                <button className="button button-secondary"
-                        onClick={this.handleCancel}>Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-          <p>&nbsp;</p>
-          <p>Don't have a user account? <a href="/signup">Click here</a> to sign up!</p>
-        </div>
+              <p>&nbsp;</p>
+              <p>Don't have a user account? <a href="/signup">Click here</a> to sign up!</p>
+            </div>
+          )}
+        </AuthContext.Consumer>
       </div>
     )
   }
