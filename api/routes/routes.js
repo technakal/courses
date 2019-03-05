@@ -66,9 +66,6 @@ const authenticateUser = (req, res, next) => {
   }
 };
 
-// TODO Create token based authentication
-// TODO Add token based auth to all routes except sign-in
-
 /**
  * Checks if the current user is the owner of the current course.
  * @param [object] req - The request object, containing course and user information.
@@ -171,7 +168,20 @@ router.post('/users', [
       user.password = bcrypt.hashSync( user.password );
       user.save( ( err ) => {
         if ( err ) return next( err );
-        return res.status( 201 ).location( '/' ).end();
+        req.token = jwt.sign(
+          {username: user.emailAddress},
+          config.secret,
+          {expiresIn: '30d'}
+        );
+        const userRes = {
+          user: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            emailAddress: user.emailAddress
+          },
+          token: req.token
+        };
+        return res.status( 201 ).location( '/' ).json(userRes).end();
       } );
     }
   });

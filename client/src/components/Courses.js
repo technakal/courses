@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
 
 // Components
 import { Error } from './Errors';
@@ -42,15 +43,14 @@ class Courses extends Component {
   state = {
     courses: [],
     errors: [],
-    isLoading: true,
-    isAuthenticated: true
+    isLoading: true
   };
 
   // TODO Optional! If authenticated, render list of user courses.
-  dbURI = 'http://localhost:5000/api/courses';
 
   componentWillMount () {
-    fetch(this.dbURI)
+    const dbURI = 'http://localhost:5000/api/courses';
+    fetch(dbURI)
       .then(response => response.json())
       .then(data => this.setState({courses: data, isLoading: false}))
       .catch(error => this.setState({errors: error}));
@@ -62,16 +62,18 @@ class Courses extends Component {
     } else if(!this.state.courses.length) {
       return <Error errors={this.state.errors}/>
     } else {
-      const { isAuthenticated } = this.state;
       return (
         <Fragment>
           {courses.map(course =>
             <CourseCard key={course._id} course={course} />
           )}
-          { isAuthenticated
-            ? <NewCourse/>
-            : null
-          }
+          <AuthContext.Consumer>
+            {context =>
+              context.state.isAuthenticated
+                ? <NewCourse/>
+                : null
+            }
+          </AuthContext.Consumer>
         </Fragment>
       );
     }

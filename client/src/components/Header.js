@@ -24,20 +24,20 @@ const Header = (props) => {
       <div className={"bounds"}>
         <Link to={'/'}><h1 className={"header--logo"}>Courses</h1></Link>
         <nav>
-              <AuthContext.Consumer>
-                {(context) => (
-                  context.state.isAuthenticated
-                    ? <Fragment>
-                        <span>Welcome back, {context.state.user}!</span>
-                        <SignOut handleSignOut={context.signOut}/>
-                      </Fragment>
-                      :<Fragment>
-                        <Link className={"signup"} to={"/signup"} >Sign Up</Link>
-                        <Link className={"signup"} to={"/signin"} >Sign In</Link>
-                      </Fragment>
-                )
-                }
-              </AuthContext.Consumer>
+          <AuthContext.Consumer>
+            {(context) => (
+              context.state.isAuthenticated
+                ? <Fragment>
+                    <span>Welcome back, {context.state.user.firstName}!</span>
+                    <SignOut handleSignOut={context.signOut}/>
+                  </Fragment>
+                  :<Fragment>
+                    <Link className={"signup"} to={"/signup"} >Sign Up</Link>
+                    <Link className={"signup"} to={"/signin"} >Sign In</Link>
+                  </Fragment>
+            )
+            }
+          </AuthContext.Consumer>
         </nav>
       </div>
     </header>

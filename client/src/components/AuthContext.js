@@ -4,9 +4,9 @@ const AuthContext = React.createContext();
 
 class AuthProvider extends Component {
   state = {
-    isAuthenticated: true,
+    isAuthenticated: false,
     token: null,
-    user: 'Noel Keener'
+    user: null
   };
 
   render () {
@@ -14,7 +14,6 @@ class AuthProvider extends Component {
       <AuthContext.Provider value={ {
         state: this.state,
         signIn: (user, token) => {
-          console.log(user, token);
           this.setState(prevState => ({
             isAuthenticated: true,
             token,
