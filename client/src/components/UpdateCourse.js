@@ -2,17 +2,18 @@ import axios from 'axios';
 import React, { Component, Fragment } from 'react';
 import { ValidationErrors } from './Errors';
 
+import { AuthContext } from './AuthContext';
+
 // TODO Once updated, route to the CourseDetails for the new course
-// TODO Create cancel button to reroute to Courses
 // TODO Handle unauthorized errors
 
 const UpdateForm = (props) => {
-  const { handleSubmit, handleCancel, course } = props;
+  const { handleSubmit, handleCancel, course, token } = props;
   const { title, description, estimatedTime, materialsNeeded } = course;
   const user = course.user[0];
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={(e) => handleSubmit(e, token)}>
       <div className="grid-66">
         <div className="course--header">
           <h4 className="course--label">Course</h4>
@@ -81,9 +82,19 @@ class UpdateCourse extends Component {
       );
   }
 
-  handleSubmit = (e) => {
+  handleSubmit = (e, token) => {
     e.preventDefault();
-    console.log(e);
+    if(token === null || token === undefined || !token) {
+      this.props.history.push('/signin');
+    } else {
+      const data = {};
+      const options = {
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${token}`
+        }
+      };
+    }
   };
 
   handleCancel = (e) => {
@@ -105,7 +116,11 @@ class UpdateCourse extends Component {
               ? <ValidationErrors errors={ errors }/>
               : null
             }
-            <UpdateForm course={course} handleSubmit={this.handleSubmit} handleCancel={this.handleCancel}/>
+            <AuthContext.Consumer>
+              {context => (
+                <UpdateForm course={course} token={context.state.token} handleSubmit={this.handleSubmit} handleCancel={this.handleCancel}/>
+              )}
+            </AuthContext.Consumer>
           </Fragment>
         }
       </div>

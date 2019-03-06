@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
@@ -50,17 +51,39 @@ class Courses extends Component {
 
   componentWillMount () {
     const dbURI = 'http://localhost:5000/api/courses';
-    fetch(dbURI)
-      .then(response => response.json())
-      .then(data => this.setState({courses: data, isLoading: false}))
-      .catch(error => this.setState({errors: error}));
+
+    axios.get(dbURI)
+      .then(res => {
+        if (res.status === 200) {
+          this.setState({courses: res.data, isLoading: false});
+        }
+      })
+      .catch(error => {
+        if ( error.response.status !== 404 ) {
+          this.props.history.push( '/error' );
+        }
+      })
   }
 
   renderComponent = (courses) => {
     if(this.state.isLoading) {
       return <Loading />;
     } else if(!this.state.courses.length) {
-      return <Error errors={this.state.errors}/>
+      return (
+        <Fragment>
+          <div>
+            <h1>No Courses Found</h1>
+            <p>Be the first to create one!</p>
+          </div>
+          <AuthContext.Consumer>
+            {context =>
+              context.state.isAuthenticated
+                ? <NewCourse/>
+                : null
+            }
+          </AuthContext.Consumer>
+        </Fragment>
+      );
     } else {
       return (
         <Fragment>

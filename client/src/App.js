@@ -17,7 +17,6 @@ class App extends Component {
   };
 
   render() {
-    const { user } = this.state;
     const notFound = {
       message: `You haven't found what you're looking for, but you have found our secret lair. You really shouldn't be here.`,
       status: 404,
@@ -38,7 +37,7 @@ class App extends Component {
       <AuthProvider>
         <BrowserRouter>
           <div>
-            <Header isAuthenticated={this.state.isAuthenticated} user={user}/>
+            <Header />
             <Switch>
               <Route exact path={"/"} render={() => <Redirect to={"/courses"} />}/>
               <Route exact path={"/courses"} component={Courses} />

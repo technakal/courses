@@ -3,6 +3,7 @@ import Markdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+import { AuthContext } from './AuthContext';
 import { Error } from './Errors';
 
 /**
@@ -12,7 +13,7 @@ import { Error } from './Errors';
  * @returns {jsx} ActionBar
  * @constructor
  */
-const ActionBar = ({courseId, handleDelete}) => {
+const ActionBar = ({courseId, token, handleDelete}) => {
   return (
     <div className={"actions--bar"}>
       <div className={"bounds"}>
@@ -21,7 +22,7 @@ const ActionBar = ({courseId, handleDelete}) => {
               {/* TODO Add update course route */}
               <Link className={"button"} to={`/courses/${courseId}/update`}>Update Course</Link>
               {/*TODO Add delete course route */}
-              <button className={"button"} onClick={handleDelete}>Delete Course</button>
+              <button className={"button"} onClick={(e) => handleDelete(e, token)}>Delete Course</button>
             </span>
          </div>
       </div>
@@ -99,7 +100,6 @@ const CourseStats = props => {
 class CourseDetails extends Component {
   state = {
     id: this.props.match.params.id,
-    isAuthenticated: true,
     course: {
       _id: null,
       title: null,
@@ -126,9 +126,8 @@ class CourseDetails extends Component {
       });
   }
 
-  deleteCourse = (e) => {
+  deleteCourse = (e, token) => {
     e.preventDefault();
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvZUBzbWl0aC5jb20iLCJpYXQiOjE1NTE2MTY4MTksImV4cCI6MTU1NDIwODgxOX0.jI__WajJycaxijiJxLEIWfrMVo4O_yZlAcZ3963gwDU'
     const options = {
       headers: {
         'Content-Type': 'application/json',
@@ -139,7 +138,6 @@ class CourseDetails extends Component {
     axios.delete(this.dbURI, options)
       .then(res => {
         if(res.status === 204) {
-          console.log(res);
           this.props.history.push('/courses');
         }
       })
@@ -172,14 +170,15 @@ class CourseDetails extends Component {
   }
 
   render() {
-    const { isAuthenticated } = this.state;
-
     return(
       <div>
-        { isAuthenticated
-          ? <ActionBar courseId={this.state.id}  handleDelete={this.deleteCourse} />
-          : null
-        }
+        <AuthContext.Consumer>
+          {context => (
+            context.state.isAuthenticated
+              ? <ActionBar courseId={this.state.id} token={context.state.token} handleDelete={this.deleteCourse}/>
+              : null
+          )}
+        </AuthContext.Consumer>
         { this.renderComponent() }
       </div>
     )

@@ -197,7 +197,12 @@ router.get('/courses', (req, res, next) => {
     .populate('user', ['firstName', 'lastName'])
     .exec((err, courses) => {
       if (err) return next(err);
-      res.status(200).json(courses);
+      if(!courses) {
+        const errorMessage = ['No courses found.'];
+        res.status(404).json(errorMessage);
+      } else {
+        res.status(200).json(courses);
+      }
     });
 });
 
