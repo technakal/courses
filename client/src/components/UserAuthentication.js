@@ -107,7 +107,6 @@ class SignIn extends Component {
  * Sign Up Component
  */
 // TODO Persist authentication across sessions
-// TODO After sign-in, reroute to Courses
 class SignUp extends Component {
   state = {
     errors: []

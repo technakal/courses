@@ -1,9 +1,5 @@
 import React from 'react';
 
-// TODO Add ValidationError component
-// TODO Add NotFound component
-// TODO Add Forbidden component
-
 const ValidationErrors = (props) => {
   const { errors } = props;
   return (

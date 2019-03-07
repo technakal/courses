@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import {AuthContext} from './AuthContext';
-// TODO Import User components
 
 /**
  * Sign Out Component
@@ -13,7 +12,6 @@ const SignOut = (props) => {
 };
 
 // TODO Remove user authentication token
-// TODO Redirect to Courses route
 
 /**
  * Header Component
