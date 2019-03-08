@@ -11,7 +11,7 @@ const SignOut = (props) => {
   )
 };
 
-// TODO Remove user authentication token
+// TODO Remove user authentication token on sign out
 
 /**
  * Header Component

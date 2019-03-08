@@ -14,6 +14,10 @@ class SignIn extends Component {
     errors: []
   };
 
+  componentDidMount () {
+    document.querySelector('#emailAddress').focus();
+  };
+
   handleChange = (e) => {
     this.setState({ [e.target.id]: e.target.value });
   };
@@ -35,7 +39,8 @@ class SignIn extends Component {
           const user = {
             firstName: res.data.user.firstName,
             lastName: res.data.user.lastName,
-            emailAddress: res.data.user.emailAddress
+            emailAddress: res.data.user.emailAddress,
+            id: res.data.user._id
           };
           signIn(user, res.data.token);
           this.props.history.goBack();
@@ -110,6 +115,10 @@ class SignIn extends Component {
 class SignUp extends Component {
   state = {
     errors: []
+  };
+
+  componentDidMount() {
+    document.querySelector('#firstName').focus();
   };
 
   handleChange = (e) => {

@@ -4,13 +4,12 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 
 // Components
-import { Error } from './Errors';
 import Loading from './Loading';
 
 const NewCourse = () => {
   return (
     <div className="grid-33">
-      <a className="course--module course--add--module" href="/courses/create">
+      <Link className="course--module course--add--module" to="/courses/create">
         <h3 className="course--add--title">
           <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                viewBox="0 0 13 13" className="add">
@@ -18,7 +17,7 @@ const NewCourse = () => {
           </svg>
           New Course
         </h3>
-      </a>
+      </Link>
     </div>
   )
 };
