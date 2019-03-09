@@ -1,58 +1,72 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
+// Component imports
 import { ValidationErrors } from './Errors';
+import { AuthContext } from './AuthContext';
 
 /**
  * Sign In Component
+ * Handles the API calls for signing into an existing account.
  */
-// TODO Persist authentication across sessions
-// TODO After sign-in, reroute to last page visited
 class SignIn extends Component {
   state = {
-    errors: []
+    errors: [],
   };
 
-  dbURI = `http://localhost:5000/api/users`;
+  // Sets focus on the first entry field.
+  componentDidMount() {
+    document.querySelector('#emailAddress').focus();
+  }
 
-  handleChange = (e) => {
+  // Sets the corresponding state value to match the input.
+  handleChange = e => {
     this.setState({ [e.target.id]: e.target.value });
   };
 
-  handleSubmit = (e) => {
+  // Performs the API call for the user.
+  handleSubmit = (e, signIn) => {
     e.preventDefault();
-    const credentials = window.btoa(this.state.emailAddress + ':' + this.state.password);
+    const dbURI = `http://localhost:5000/api/users`;
+    const credentials = window.btoa(
+      this.state.emailAddress + ':' + this.state.password
+    );
     const options = {
       headers: {
         'Content-Type': 'application/json',
-        "Authorization": `Basic ${credentials}`
-      }
+        Authorization: `Basic ${credentials}`,
+      },
     };
 
-    axios.get(this.dbURI, options)
+    axios
+      .get(dbURI, options)
       .then(res => {
         if (res.status === 200) {
-          this.setState( {isAuthenticated: true, user: res.data.user, token: res.data.token });
-          this.props.history.push('/courses');
+          const user = {
+            firstName: res.data.user.firstName,
+            lastName: res.data.user.lastName,
+            emailAddress: res.data.user.emailAddress,
+            id: res.data.user._id,
+          };
+          signIn(user, res.data.token);
+          this.props.history.goBack();
         }
       })
       .catch(error => {
-        if(error.response.status === 404) {
-          this.props.history.push( '/notfound' );
+        if (error.response.status === 404) {
+          this.props.history.push('/notfound');
         } else if (error.response.status === 401) {
-          this.setState(
-            {
-              errors: [
-                error.response.data.error
-              ]
-          })
+          this.setState({
+            errors: [error.response.data.error],
+          });
         } else {
           this.props.history.push('/error');
         }
       });
   };
 
-  handleCancel = (e) => {
+  // Returns the user to the courses main page.
+  handleCancel = e => {
     e.preventDefault();
     this.props.history.push('/courses');
   };
@@ -62,122 +76,202 @@ class SignIn extends Component {
 
     return (
       <div className="bounds">
-        <div className="grid-33 centered signin">
-          <h1>Sign In</h1>
-          <div>
-            { errors.length
-              ? <ValidationErrors errors={errors}/>
-              : null
-            }
-            <form onSubmit={this.handleSubmit}>
+        <AuthContext.Consumer>
+          {context => (
+            <div className="grid-33 centered signin">
+              <h1>Sign In</h1>
               <div>
-                <input id="emailAddress" name="emailAddress" type="text" className="" placeholder="Email Address" defaultValue="" onChange={this.handleChange}/>
+                {errors.length ? <ValidationErrors errors={errors} /> : null}
+                <form
+                  onSubmit={e => {
+                    this.handleSubmit(e, context.signIn);
+                  }}>
+                  <div>
+                    <input
+                      id="emailAddress"
+                      name="emailAddress"
+                      type="text"
+                      className=""
+                      placeholder="Email Address"
+                      defaultValue=""
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      className=""
+                      placeholder="Password"
+                      defaultValue=""
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                  <div className="grid-100 pad-bottom">
+                    <button className="button" type="submit">
+                      Sign In
+                    </button>
+                    <button
+                      className="button button-secondary"
+                      onClick={this.handleCancel}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
-              <div>
-                <input id="password" name="password" type="password" className="" placeholder="Password" defaultValue="" onChange={this.handleChange}/>
-              </div>
-              <div className="grid-100 pad-bottom">
-                <button className="button" type="submit">Sign In</button>
-                <button className="button button-secondary"
-                        onClick={this.handleCancel}>Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-          <p>&nbsp;</p>
-          <p>Don't have a user account? <a href="/signup">Click here</a> to sign up!</p>
-        </div>
+              <p>&nbsp;</p>
+              <p>
+                Don't have a user account? <a href="/signup">Click here</a> to
+                sign up!
+              </p>
+            </div>
+          )}
+        </AuthContext.Consumer>
       </div>
-    )
+    );
   }
 }
 
 /**
  * Sign Up Component
+ * Handles the API calls for creating a new user account.
  */
-// TODO Persist authentication across sessions
-// TODO After sign-in, reroute to Courses
 class SignUp extends Component {
   state = {
-    errors: []
+    errors: [],
   };
 
-  dbURI = `http://localhost:5000/api/users`;
+  // Sets focus on the first input.
+  componentDidMount() {
+    document.querySelector('#firstName').focus();
+  }
 
-  handleChange = (e) => {
+  // Sets the corresponding state value to match the given input.
+  handleChange = e => {
     this.setState({ [e.target.id]: e.target.value });
   };
 
-  handleSubmit = (e) => {
+  // Performs the POST request to the API.
+  handleSubmit = (e, signIn) => {
     e.preventDefault();
+    const dbURI = `http://localhost:5000/api/users`;
     const data = {
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       emailAddress: this.state.emailAddress,
-      password: this.state.password
+      password: this.state.password,
     };
 
-    axios.post(this.dbURI, data)
+    axios
+      .post(dbURI, data)
       .then(res => {
         if (res.status === 201) {
-          this.setState( {isAuthenticated: true, user: res.data.user })
-          this.props.history.push('/courses');
+          const user = {
+            firstName: res.data.user.firstName,
+            lastName: res.data.user.lastName,
+            emailAddress: res.data.user.emailAddress,
+          };
+          signIn(user, res.data.token);
+          this.props.history.goBack();
         }
       })
       .catch(error => {
-        if(error.response.status === 404) {
-          this.props.history.push( '/notfound' );
+        if (error.response.status === 404) {
+          this.props.history.push('/notfound');
         } else if (error.response.status === 400) {
-          console.log(error.response);
-          this.setState({errors: error.response.data.errors});
+          this.setState({ errors: error.response.data.errors });
+        } else if (error.response.status === 409) {
+          this.setState({ errors: [error.response.data.message] });
         } else {
           this.props.history.push('/error');
         }
       });
   };
 
-  handleCancel = (e) => {
+  // Returns the user to the courses main page.
+  handleCancel = e => {
     e.preventDefault();
     this.props.history.push('/courses');
   };
 
   render() {
     const { errors } = this.state;
-    return(
+    return (
       <div className="bounds">
-        <div className="grid-33 centered signin">
-          <h1>Sign Up</h1>
-          <div>
-            { errors.length
-              ? <ValidationErrors errors={errors}/>
-              : null
-            }
-            <form onSubmit={this.handleSubmit}>
+        <AuthContext.Consumer>
+          {context => (
+            <div className="grid-33 centered signin">
+              <h1>Sign Up</h1>
               <div>
-                <input id="firstName" name="firstName" type="text" className="" placeholder="First Name" defaultValue="" onChange={this.handleChange} />
+                {errors.length ? <ValidationErrors errors={errors} /> : null}
+                <form onSubmit={e => this.handleSubmit(e, context.signIn)}>
+                  <div>
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      className=""
+                      placeholder="First Name"
+                      defaultValue=""
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      className=""
+                      placeholder="Last Name"
+                      defaultValue=""
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      id="emailAddress"
+                      name="emailAddress"
+                      type="text"
+                      className=""
+                      placeholder="Email Address"
+                      defaultValue=""
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      className=""
+                      placeholder="Password"
+                      defaultValue=""
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                  <div className="grid-100 pad-bottom">
+                    <button className="button" type="submit">
+                      Sign Up
+                    </button>
+                    <button
+                      className="button button-secondary"
+                      onClick={this.handleCancel}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
-              <div>
-                <input id="lastName" name="lastName" type="text" className="" placeholder="Last Name" defaultValue="" onChange={this.handleChange}/>
-              </div>
-              <div>
-                <input id="emailAddress" name="emailAddress" type="text" className="" placeholder="Email Address" defaultValue="" onChange={this.handleChange}/>
-                </div>
-              <div>
-                <input id="password" name="password" type="password" className="" placeholder="Password" defaultValue="" onChange={this.handleChange}/>
-              </div>
-              <div className="grid-100 pad-bottom">
-                <button className="button" type="submit">Sign Up</button>
-                <button className="button button-secondary" onClick={this.handleCancel}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-          <p>&nbsp;</p>
-          <p>Already have a user account? <a href="/signin">Click here</a> to sign in!</p>
-        </div>
+              <p>&nbsp;</p>
+              <p>
+                Already have a user account? <a href="/signin">Click here</a> to
+                sign in!
+              </p>
+            </div>
+          )}
+        </AuthContext.Consumer>
       </div>
-    )
+    );
   }
 }
 

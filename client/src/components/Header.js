@@ -1,39 +1,53 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-// TODO Import User components
+
+// Component imports
+import { AuthContext } from './AuthContext';
+import ErrorBoundary from './ErrorBoundary';
 
 /**
- * Sign Out Component
+ * Displays the sign out option.
  */
-const SignOut = (props) => {
+const SignOut = props => {
   return (
-    <Link className={"signout"} to={'/signout'}>Sign Out</Link>
-  )
+    <Link className={'signout'} onClick={props.handleSignOut} to={'/courses'}>
+      Sign Out
+    </Link>
+  );
 };
-
-// TODO Remove user authentication token
-// TODO Redirect to Courses route
 
 /**
  * Header Component
  */
-const Header = (props) => {
-  const { isAuthenticated, user } = props;
-  return(
-    <header className={"header"}>
-      <div className={"bounds"}>
-        <Link to={'/'}><h1 className={"header--logo"}>Courses</h1></Link>
+const Header = () => {
+  return (
+    <header className={'header'}>
+      <div className={'bounds'}>
+        <Link to={'/'}>
+          <h1 className={'header--logo'}>Courses</h1>
+        </Link>
         <nav>
-          {isAuthenticated
-            ? <Fragment>
-                <span>Welcome back, {`${user.firstName} ${user.lastName}!`}</span>
-                <SignOut />
-              </Fragment>
-            : <Fragment>
-                <Link className={"signup"} to={"/signup"} >Sign Up</Link>
-                <Link className={"signup"} to={"/signin"} >Sign In</Link>
-              </Fragment>
-          }
+          <ErrorBoundary>
+            <AuthContext.Consumer>
+              {context =>
+                context.state.isAuthenticated ? (
+                  <Fragment>
+                    <span>Welcome back, {context.state.user.firstName}!</span>
+                    <SignOut handleSignOut={context.signOut} />
+                  </Fragment>
+                ) : (
+                  <Fragment>
+                    <Link className={'signup'} to={'/signup'}>
+                      Sign Up
+                    </Link>
+                    <Link className={'signup'} to={'/signin'}>
+                      Sign In
+                    </Link>
+                  </Fragment>
+                )
+              }
+            </AuthContext.Consumer>
+          </ErrorBoundary>
         </nav>
       </div>
     </header>
