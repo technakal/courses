@@ -4,17 +4,7 @@ import { Link } from 'react-router-dom';
 // Component imports
 import { AuthContext } from './AuthContext';
 import ErrorBoundary from './ErrorBoundary';
-
-/**
- * Displays the sign out option.
- */
-const SignOut = props => {
-  return (
-    <Link className={'signout'} onClick={props.handleSignOut} to={'/courses'}>
-      Sign Out
-    </Link>
-  );
-};
+import { UserSignOut } from './UserAuthentication';
 
 /**
  * Header Component
@@ -33,7 +23,7 @@ const Header = () => {
                 context.state.isAuthenticated ? (
                   <Fragment>
                     <span>Welcome back, {context.state.user.firstName}!</span>
-                    <SignOut handleSignOut={context.signOut} />
+                    <UserSignOut handleSignOut={context.signOut} />
                   </Fragment>
                 ) : (
                   <Fragment>

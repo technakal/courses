@@ -122,7 +122,13 @@ class UpdateCourse extends Component {
       .then(res => {
         if (res.status === 200) {
           this.setState({ course: res.data, isLoading: false }, () => {
-            document.querySelector('#title').focus();
+            const currentUserId = this.context.state.user.id;
+            const courseOwnerId = this.state.course.user[0]._id;
+            if (currentUserId === courseOwnerId) {
+              document.querySelector('#title').focus();
+            } else {
+              this.props.history.push('/forbidden');
+            }
           });
         }
       })
@@ -161,7 +167,7 @@ class UpdateCourse extends Component {
    */
   handleSubmit = (e, token) => {
     e.preventDefault();
-    if (token === null || token === undefined || !token) {
+    if (!token || token === undefined) {
       this.props.history.push('/signin');
     } else {
       const course = this.state.course;
@@ -231,5 +237,7 @@ class UpdateCourse extends Component {
     );
   }
 }
+
+UpdateCourse.contextType = AuthContext;
 
 export default UpdateCourse;

@@ -192,21 +192,17 @@ class CreateCourse extends Component {
       <div className={'bounds course--detail'}>
         <h1>Create Course</h1>
         <AuthContext.Consumer>
-          {context =>
-            !context.state.isAuthenticated ? (
-              <h2>You must sign in to create a new course.</h2>
-            ) : (
-              <div>
-                {errors.length ? <ValidationErrors errors={errors} /> : null}
-                <CreateCourseForm
-                  user={context.state.user}
-                  handleChange={this.handleChange}
-                  handleSubmit={this.handleSubmit}
-                  handleCancel={this.handleCancel}
-                />
-              </div>
-            )
-          }
+          {context => (
+            <div>
+              {errors.length ? <ValidationErrors errors={errors} /> : null}
+              <CreateCourseForm
+                user={context.state.user}
+                handleChange={this.handleChange}
+                handleSubmit={this.handleSubmit}
+                handleCancel={this.handleCancel}
+              />
+            </div>
+          )}
         </AuthContext.Consumer>
       </div>
     );

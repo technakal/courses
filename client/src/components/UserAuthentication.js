@@ -1,15 +1,44 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 // Component imports
 import { ValidationErrors } from './Errors';
 import { AuthContext } from './AuthContext';
 
 /**
+ * Displays the sign out option.
+ */
+const UserSignOut = props => {
+  return (
+    <Link className={'signout'} onClick={props.handleSignOut} to={'/courses'}>
+      Sign Out
+    </Link>
+  );
+};
+
+/**
+ * Performs signout functions without rendering to the DOM.
+ * Used for the /signout route.
+ */
+class SignOutView extends Component {
+  componentWillMount() {
+    this.context.signOut();
+    this.props.history.push('/');
+  }
+
+  render() {
+    return null;
+  }
+}
+
+SignOutView.contextType = AuthContext;
+
+/**
  * Sign In Component
  * Handles the API calls for signing into an existing account.
  */
-class SignIn extends Component {
+class UserSignIn extends Component {
   state = {
     errors: [],
   };
@@ -137,7 +166,7 @@ class SignIn extends Component {
  * Sign Up Component
  * Handles the API calls for creating a new user account.
  */
-class SignUp extends Component {
+class UserSignUp extends Component {
   state = {
     errors: [],
   };
@@ -275,4 +304,4 @@ class SignUp extends Component {
   }
 }
 
-export { SignIn, SignUp };
+export { SignOutView, UserSignOut, UserSignIn, UserSignUp };
