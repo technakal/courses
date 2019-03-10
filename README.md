@@ -4,6 +4,18 @@
 
 > Last one, baby.
 
+### Running Locally
+To run locally, you'll have to do a bit of configuration.
+
+1. Make sure mongoDB is installed on your system.
+2. Make sure mongo uses its default access path (`mongodb://localhost:27017`).
+3. Download the repository.
+4. Install npm packages, yada yada.
+5. In the /api folder, use the command `npm run seed`. This will get your mongo collection ready for the app.
+6. Get your mongod running.
+7. In the /api folder, use `npm start`.
+8. In the /client folder, use `npm start`.
+
 ### Description
 
 A React frontend for a course directory API. The course directory API can normally be found at https://github.com/technakal/techdegree-unit-09, but for this assignment, I've also included it in this repo.
