@@ -5,11 +5,16 @@ import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { AuthProvider } from './components/AuthContext';
 import Header from './components/Header';
 import Courses from './components/Courses';
-import CourseDetails from './components/CourseDetails';
+import CourseDetail from './components/CourseDetail';
 import CreateCourse from './components/CreateCourse';
 import UpdateCourse from './components/UpdateCourse';
-import { SignIn, SignUp } from './components/UserAuthentication';
+import {
+  SignOutView,
+  UserSignIn,
+  UserSignUp,
+} from './components/UserAuthentication';
 import { Error } from './components/Errors';
+import PrivateRoute from './components/PrivateRoute';
 
 class App extends Component {
   state = {
@@ -23,17 +28,21 @@ class App extends Component {
           <div>
             <Header />
             <Switch>
+              <Route exact path={'/'} component={Courses} />
               <Route
                 exact
-                path={'/'}
-                render={() => <Redirect to={'/courses'} />}
+                path={'/courses'}
+                render={() => <Redirect to={'/'} />}
               />
-              <Route exact path={'/courses'} component={Courses} />
-              <Route path={'/courses/create'} component={CreateCourse} />
-              <Route exact path={'/courses/:id'} component={CourseDetails} />
-              <Route path={'/courses/:id/update'} component={UpdateCourse} />
-              <Route path={'/signin'} component={SignIn} />
-              <Route path={'/signup'} component={SignUp} />
+              <PrivateRoute path={'/courses/create'} component={CreateCourse} />
+              <Route exact path={'/courses/:id'} component={CourseDetail} />
+              <PrivateRoute
+                path={'/courses/:id/update'}
+                component={UpdateCourse}
+              />
+              <Route path={'/signin'} component={UserSignIn} />
+              <Route path={'/signup'} component={UserSignUp} />
+              <Route path={'/signout'} component={SignOutView} />
               <Route
                 path={'/notfound'}
                 render={() => <Error error={'notfound'} />}

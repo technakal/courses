@@ -15,19 +15,31 @@ import ErrorBoundary from './ErrorBoundary';
  * @returns {jsx} ActionBar
  * @constructor
  */
-const ActionBar = ({ courseId, token, handleDelete }) => {
+const ActionBar = ({ courseId, handleDelete }) => {
   return (
     <div className={'actions--bar'}>
       <div className={'bounds'}>
         <div className={'grid-100'}>
-          <span>
-            <Link className={'button'} to={`/courses/${courseId}/update`}>
-              Update Course
-            </Link>
-            <button className={'button'} onClick={e => handleDelete(e, token)}>
-              Delete Course
-            </button>
-          </span>
+          <AuthContext.Consumer>
+            {context => (
+              <span>
+                <Link className={'button'} to={`/courses/${courseId}/update`}>
+                  Update Course
+                </Link>
+                <button
+                  className={'button'}
+                  onClick={e => handleDelete(e, context.state.token)}>
+                  Delete Course
+                </button>
+                {!context.state.isAuthenticated ? (
+                  <span>
+                    You must <Link to={'/signin'}>sign in</Link> to make
+                    changes.
+                  </span>
+                ) : null}
+              </span>
+            )}
+          </AuthContext.Consumer>
         </div>
       </div>
     </div>
@@ -94,11 +106,11 @@ const CourseStats = props => {
 };
 
 /**
- * Course Details Component
+ * Course Detail Component
  * Provides additional details about a course.
  * Allows authenticated users to edit or delete the course, if they own it.
  */
-class CourseDetails extends Component {
+class CourseDetail extends Component {
   state = {
     id: this.props.match.params.id,
     course: {
@@ -107,17 +119,26 @@ class CourseDetails extends Component {
       description: null,
       user: [],
     },
+    displayActions: false,
   };
 
   dbURI = `http://localhost:5000/api/courses/${this.state.id}`;
 
   // Retrieves the course details from the API
   componentDidMount() {
+    console.log(this.context.state.user.id);
     axios
       .get(this.dbURI)
       .then(res => {
         if (res.status === 200) {
-          this.setState({ course: res.data });
+          this.setState({ course: res.data }, () => {
+            if (
+              this.context.state.token &&
+              this.state.course.user[0]._id === this.context.state.user.id
+            ) {
+              this.setState({ displayActions: true });
+            }
+          });
         }
       })
       .catch(error => {
@@ -132,29 +153,33 @@ class CourseDetails extends Component {
   // Sends the delete request to remove the course.
   deleteCourse = (e, token) => {
     e.preventDefault();
-    const options = {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    };
+    if (!token || token === undefined) {
+      this.props.history.push('/signin');
+    } else {
+      const options = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-    axios
-      .delete(this.dbURI, options)
-      .then(res => {
-        if (res.status === 204) {
-          this.props.history.push('/courses');
-        }
-      })
-      .catch(error => {
-        if (error.response.status === 404) {
-          this.props.history.push('/notfound');
-        } else if ([401, 403].includes(error.response.status)) {
-          this.props.history.push('/forbidden');
-        } else {
-          this.props.history.push('/error');
-        }
-      });
+      axios
+        .delete(this.dbURI, options)
+        .then(res => {
+          if (res.status === 204) {
+            this.props.history.push('/courses');
+          }
+        })
+        .catch(error => {
+          if (error.response.status === 404) {
+            this.props.history.push('/notfound');
+          } else if ([401, 403].includes(error.response.status)) {
+            this.props.history.push('/forbidden');
+          } else {
+            this.props.history.push('/error');
+          }
+        });
+    }
   };
 
   renderComponent() {
@@ -177,23 +202,21 @@ class CourseDetails extends Component {
   }
 
   render() {
+    const { displayActions } = this.state;
     return (
       <div>
-        <AuthContext.Consumer>
-          {context =>
-            context.state.isAuthenticated ? (
-              <ActionBar
-                courseId={this.state.id}
-                token={context.state.token}
-                handleDelete={this.deleteCourse}
-              />
-            ) : null
-          }
-        </AuthContext.Consumer>
+        {displayActions ? (
+          <ActionBar
+            courseId={this.state.id}
+            handleDelete={this.deleteCourse}
+          />
+        ) : null}
         {this.renderComponent()}
       </div>
     );
   }
 }
 
-export default CourseDetails;
+CourseDetail.contextType = AuthContext;
+
+export default CourseDetail;
