@@ -53,6 +53,7 @@ class AuthProvider extends Component {
   componentWillMount() {
     if (storageAvailable('localStorage')) {
       const hasAuth = localStorage.getItem('token');
+
       if (hasAuth) {
         this.setState({
           isAuthenticated: true,

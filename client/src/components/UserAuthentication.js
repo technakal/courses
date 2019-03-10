@@ -151,8 +151,8 @@ class UserSignIn extends Component {
               </div>
               <p>&nbsp;</p>
               <p>
-                Don't have a user account? <a href="/signup">Click here</a> to
-                sign up!
+                Don't have a user account? <Link to="/signup">Click here</Link>{' '}
+                to sign up!
               </p>
             </div>
           )}
@@ -200,6 +200,7 @@ class UserSignUp extends Component {
             firstName: res.data.user.firstName,
             lastName: res.data.user.lastName,
             emailAddress: res.data.user.emailAddress,
+            id: res.data.user.id,
           };
           signIn(user, res.data.token);
           this.props.history.goBack();
@@ -293,8 +294,8 @@ class UserSignUp extends Component {
               </div>
               <p>&nbsp;</p>
               <p>
-                Already have a user account? <a href="/signin">Click here</a> to
-                sign in!
+                Already have a user account?{' '}
+                <Link to="/signin">Click here</Link> to sign in!
               </p>
             </div>
           )}

@@ -126,6 +126,7 @@ class CourseDetail extends Component {
 
   // Retrieves the course details from the API
   componentDidMount() {
+    console.log(this.context.state.user.id);
     axios
       .get(this.dbURI)
       .then(res => {

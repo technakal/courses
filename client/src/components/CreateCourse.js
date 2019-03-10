@@ -107,6 +107,7 @@ const CreateCourseForm = ({ handleChange, handleSubmit, handleCancel }) => {
 class CreateCourse extends Component {
   state = {
     errors: [],
+    course: {},
   };
 
   componentDidMount() {

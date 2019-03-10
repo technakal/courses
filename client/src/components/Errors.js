@@ -37,7 +37,7 @@ const setError = url => {
 
   if (url === 'forbidden') {
     return {
-      message: `You're not allowed to do that.`,
+      message: `You're not allowed to do that. You either don't have permission to make the change you requested, or you're not signed in.`,
       status: 401,
       statusText: 'Forbidden',
     };
@@ -47,7 +47,7 @@ const setError = url => {
     message:
       'This is embarrassing, but something went wrong. Not really sure what...',
     status: 500,
-    statusText: 'Uh-oh',
+    statusText: 'Server Meltdown',
   };
 };
 

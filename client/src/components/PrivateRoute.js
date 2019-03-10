@@ -6,6 +6,7 @@ import { AuthContext } from './AuthContext';
 
 /**
  * Provides authentication checking for Routes.
+ * Made with help from Tyler Mcginnis. https://tylermcginnis.com/react-router-protected-routes-authentication/
  * @param {object} component - The Component to render if authenticated
  */
 const PrivateRoute = ({ component: Component, ...rest }) => {
